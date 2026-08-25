@@ -188,12 +188,12 @@ print(answer2)
 # from dotenv import load_dotenv
 # from google import genai
 # load_dotenv()
-# api_key = os.getenv("CHAT_GPT")
+# api_key = os.getenv("GEMINI_API_KEY")
 # client = genai.Client(api_key=api_key)
 # def ask_llm(prompt):
 #     try:
 #         response = client.models.generate_content(
-#             model='openai/gpt-4.1',
+#             model='gemini-3.5-flash',
 #             contents=prompt
 #         )
 #         return response.text
@@ -211,18 +211,53 @@ print(answer2)
 # Q10.
 
 # import os
+
 # from dotenv import load_dotenv
 # from google import genai
+
 # load_dotenv()
+
 # api_key = os.getenv("GEMINI_API_KEY")
+
 # client = genai.Client(api_key=api_key)
+
+
 # def ask_llm(prompt):
+
 #     response = client.models.generate_content(
-#         model='gemini-3.5-flash',
+#         model="gemini-3.5-flash",
 #         contents=prompt
 #     )
+
 #     return response.text
-# Doubt
+
+
+# chat_history = []
+
+
+# while True:
+
+#     question = input("Ask a question: ")
+
+#     if question.lower() == "exit":
+#         print("Goodbye! Have a nice day")
+#         break
+#     chat_history.append(question)
+#     history = "\n".join(chat_history)
+#     answer = ask_llm(
+#         f"""
+# Here are the previous questions asked by the user:
+
+# {history}
+
+# Answer the user's latest question:
+
+# {question}
+# """
+#     )
+
+#     print("AI:", answer)
+
 
 
 # Q11.
@@ -257,31 +292,125 @@ print(answer2)
 
     
 # Q12.
-import os
+
+# import os
+# import time
+# from dotenv import load_dotenv
+# from google import genai
+# load_dotenv()
+# api_key = os.getenv("GEMINI_API_KEY")
+# client = genai.Client(api_key=api_key)
+# def ask_llm(prompt):
+#     for attempt in range(1,4):
+#         try:
+#             response = client.models.generate_content(
+#             model = 'gemini-3.5-flash',
+#             contents=prompt
+#             )
+#             return response.text
+        
+#         except Exception:
+#             print(f"Attempt {attempt} failed. ")
+#             if attempt<3:
+#                 print("Retrying...")
+#                 time.sleep(2)
+#     return "Unable to get a response. "
+# question = input("Enter Your Question:")
+# answer = ask_llm(question)
+# print(answer)
+
+# Q13.
+import os 
 import time
+import json
+import pandas as pd
 from dotenv import load_dotenv
 from google import genai
 load_dotenv()
+sentences_of_history=[]
+with open("history.jsonl","r") as file:
+    for line in file:
+        message=json.loads(line)
+        
+        sentences_of_history.append(message)
+text_history=json.dumps(sentences_of_history)
 api_key = os.getenv("GEMINI_API_KEY")
 client = genai.Client(api_key=api_key)
+system_instructions = "You are an AI assistant. Answer the user questions in a simple way and polite language."
 def ask_llm(prompt):
-    for attempt in range(1,4):
+    for attempt in range (1,4):
         try:
             response = client.models.generate_content(
-            model = 'gemini-3.5-flash',
-            contents=prompt
+                model='gemini-3.6-flash',
+                contents=prompt,
+                config={
+                "system_instruction":system_instructions
+                }
             )
             return response.text
-        except Exception:
-            print(f"Attempt {attempt} failed. ")
-            if attempt<3:
-                print("Retrying...")
+        except Exception as error :
+            print(f"Attempt {attempt} failed")
+            if attempt < 3:
+                print("Retrying")
                 time.sleep(2)
-    return "Unable to get a response. "
-question = input("Enter Your Question:")
-answer = ask_llm(question)
-print(answer)
+            else:
+                return "Unable to get a response"
+conversation_history = []
+while True:
+   question = input("Ask a question:")
+   conversation_history.append(question)
+   conversation_history.append(text_history)
+
+   if question.lower()=="exit":
+      print("Goodbye! Have a nice day")
+      break
+   answer = ask_llm(conversation_history)
+   print(answer)
+
+   with open("history.jsonl","a") as file :
+       json.dump(
+           {
+      "role": "user",
+      "content": question
+           }
+       ,file)
+       file.write("\n")
+       json.dump(
+           {
+      "role": "assistant",
+      "content": answer
+           }
+       ,file)
+       file.write("\n")
+print(ask_llm())
+print(sentences_of_history)
+
+
+
+
+
+        
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                
     
+
+
+
 
 
    
