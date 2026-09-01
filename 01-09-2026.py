@@ -179,16 +179,11 @@ Please include:
         text = input("Enter text to summarize:\n")
 
         prompt = f"""
-Summarize the following text in simple words for beginners.
+Summarize the following text in simple words for beginners in near about 60-70 words.
 
 Text:
 {text}
 
-Please include:
-
-1. Short summary
-2. Main points
-3. Easy explanation
 """
 
         answer = ask_llm(prompt)
