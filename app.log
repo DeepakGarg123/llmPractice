@@ -1,0 +1,13 @@
+2026-09-01 12:45:49,962 - INFO - API request started.
+2026-09-01 12:45:49,962 - INFO - AFC is enabled with max remote calls: 10.
+2026-09-01 12:45:49,962 - WARNING - Direct use of automatic function calling (AFC) in Models.generate_content is not recommended. Instead, we recommend to use AFC in Chat.send_message. Similarly, direct use of AFC in Models.generate_content_stream is not recommended. Instead, we recommend to use AFC in Chat.send_message_stream.
+2026-09-01 12:45:51,926 - INFO - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent "HTTP/1.1 200 OK"
+2026-09-01 12:45:51,928 - INFO - API request completed
+2026-09-01 12:46:39,729 - INFO - API request started.
+2026-09-01 12:46:39,730 - INFO - AFC is enabled with max remote calls: 10.
+2026-09-01 12:46:45,506 - INFO - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent "HTTP/1.1 200 OK"
+2026-09-01 12:46:45,508 - INFO - API request completed
+2026-09-01 12:46:58,031 - INFO - API request started.
+2026-09-01 12:46:58,031 - INFO - AFC is enabled with max remote calls: 10.
+2026-09-01 12:47:04,708 - INFO - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent "HTTP/1.1 200 OK"
+2026-09-01 12:47:04,709 - INFO - API request completed
