@@ -225,11 +225,12 @@
 # 7. Provide a short summary.
 # 8. Return only valid JSON.
 # 9. Do not add extra fields.
+# 10. i have 10 different complaints so answer all of them
 
 # Customer complaint:
 # {complaints}
 # """
-
+# print(complaints)
 # response = client.models.generate_content(
 #     model="gemini-3.6-flash",
 #     contents=prompt
@@ -289,76 +290,123 @@
 # Display a warning if they do not match.
 # Save validated invoices into JSON.
 
-import os
-import json
+# import os
+# import json
 
-from dotenv import load_dotenv
-from google import genai
+# from dotenv import load_dotenv
+# from google import genai
 
-load_dotenv()
+# load_dotenv()
 
-api_key = os.getenv("GEMINI_API_KEY")
+# api_key = os.getenv("GEMINI_API_KEY")
 
-client = genai.Client(api_key=api_key)
-
-
-invoice = """
-Invoice No: INV-9087
-Customer: ABC Technologies
-Date: 01-09-2026
-Product: Laptop
-Quantity: 3
-Unit Price: 65000
-Tax: 18%
-"""
+# client = genai.Client(api_key=api_key)
 
 
-prompt = f"""
-You are an invoice data extraction system.
+# invoice = """
+# Invoice No: INV-9087
+# Customer: ABC Technologies
+# Date: 01-09-2026
 
-Extract the information from the invoice below.
+# Product: Laptop
+# Quantity: 3
+# Unit Price: 65000
 
-Return only valid JSON with exactly these fields:
+# Product: Mouse
+# Quantity: 2
+# Unit Price: 1000
 
-{{
-    "invoice_number": "",
-    "customer": "",
-    "invoice_date": "",
-    "items": [
-        {{
-            "product": "",
-            "quantity": 0,
-            "unit_price": 0
-        }}
-    ],
-    "tax_percentage": 0,
-    "total_amount": 0
-}}
+# Product: Keyboard
+# Quantity: 1
+# Unit Price: 2000
 
-Instructions:
-
-1. Extract the invoice number.
-2. Extract the customer name.
-3. Extract the invoice date.
-4. Extract all products.
-5. Extract quantity and unit price for each product.
-6. Extract the tax percentage.
-7. Do not invent information.
-8. Return only valid JSON.
-9. Do not add extra fields.
-
-Invoice:
-
-{invoice}
-"""
+# Tax: 18%
+# """
 
 
-response = client.models.generate_content(
-    model="gemini-3.5-flash",
-    contents=prompt,
-)
-invoice_data = json.loads(response.text)
-print(invoice_data)
+# prompt = f"""
+# You are an invoice data extraction system.
+
+# Read the invoice below and extract the information.
+
+# Return only valid JSON with exactly these fields:
+
+# {{
+#     "invoice_number": "",
+#     "customer": "",
+#     "invoice_date": "",
+#     "items": [
+#         {{
+#             "product": "",
+#             "quantity": 0,
+#             "unit_price": 0
+#         }}
+#     ],
+#     "tax_percentage": 0,
+#     "total_amount": 0
+# }}
+
+# Rules:
+
+# 1. Extract the invoice number.
+# 2. Extract the customer name.
+# 3. Extract the invoice date.
+# 4. Extract all products.
+# 5. Extract quantity and unit price.
+# 6. Extract the tax percentage.
+# 7. Do not invent information.
+# 8. Return only JSON.
+# 9. Do not add extra fields.
+
+# Invoice:
+
+# {invoice}
+# """
+
+
+# response = client.models.generate_content(
+#     model="gemini-3.6-flash",
+#     contents=prompt,
+#     config={
+#         "response_mime_type": "application/json"
+#     }
+# )
+
+# invoice_data = json.loads(response.text)
+# for item in invoice_data['items']:
+#     if invoice_data['items'][0]['quantity']<=0:
+#         raise ValueError ("Invalid quantity")
+#     if invoice_data['items'][0]['unit_price']<0:
+#         print("unit_price can not be negative")
+# print(invoice_data)
+# print(invoice_data['invoice_number'])
+# print(invoice_data['customer'])
+# print(invoice_data['invoice_date'])
+# for item in invoice_data['items']:
+#     print(item['product'])
+#     print(item['quantity'])
+#     print(item['unit_price'])
+
+# item_total = 0
+# for item in invoice_data['items']:
+#     item_total = item_total+(item['quantity']*item['unit_price'])
+
+# tax_percentage = invoice_data['tax_percentage']
+# tax_amount = item_total*tax_percentage/100
+# print(tax_amount)
+# final_bill = item_total+tax_amount
+# print(final_bill)
+
+# llm_total = invoice_data['total_amount']
+# if llm_total==final_bill:
+#     print("matched successfully")
+# else :
+#     print("Gemini made a mistake")
+
+# with open('application.json' , 'w') as f:
+#     json.dump(invoice_data , f , indent=4)
+
+
 
 
 # ====================================================
@@ -409,6 +457,130 @@ print(invoice_data)
 # Write a short explanation of why structured output is
 #    better than free-form output for this system.
 
+
+# import os
+# import json
+
+# from dotenv import load_dotenv
+# from google import genai
+
+# load_dotenv()
+
+# api_key = os.getenv("GEMINI_API_KEY")
+
+# client = genai.Client(api_key=api_key)
+
+
+# resumes = [
+
+#     """
+#     Name: Deepak Garg
+
+#     Skills:
+#     Python
+#     Pandas
+#     NumPy
+#     SQL
+#     Flask
+
+#     Experience:
+#     0 years
+#     """,
+
+#     """
+#     Name: Rahul Sharma
+
+#     Skills:
+#     Python
+#     SQL
+#     Django
+#     Flask
+
+#     Experience:
+#     1 year
+#     """,
+
+#     """
+#     Name: Aman Kumar
+
+#     Skills:
+#     HTML
+#     CSS
+#     JavaScript
+
+#     Experience:
+#     2 years
+#     """
+# ]
+
+
+# job_description = """
+# We are looking for a Python Developer.
+
+# Required skills:
+
+# Python
+# SQL
+# Flask
+
+# Experience required:
+# 0-2 years
+# """
+# results = []
+# for resume in resumes:
+
+#     prompt = f"""
+#     You are a resume screening system.
+
+#     Compare the candidate's resume with the job description.
+
+#     Return only valid JSON with exactly these fields:
+
+#     {{
+#         "candidate_name": "",
+#         "match_percentage": 0,
+#         "matched_skills": [],
+#         "missing_skills": [],
+#         "experience_match": false,
+#         "recommendation": "",
+#         "reason": ""
+#     }}
+
+#     Rules:
+
+#     1. Extract the candidate's name from the resume.
+#     2. Find which required skills are present in the resume.
+#     3. Find which required skills are missing.
+#     4. Check whether the candidate's experience matches the job requirement.
+#     5. Give a match percentage between 0 and 100.
+#     6. Set experience_match to true or false.
+#     7. Recommendation must be either "Shortlist" or "Reject".
+#     8. Do not invent information.
+#     9. Return only valid JSON.
+#     10. Do not add extra fields.
+
+#     Candidate Resume:
+
+#     {resume}
+
+#     Job Description:
+
+#     {job_description}
+#     """
+
+#     response = client.models.generate_content(
+#         model="gemini-3.6-flash",
+#         contents=prompt,
+#         config={
+#             "response_mime_type": "application/json"
+#         }
+#     )
+
+#     matching = json.loads(response.text)
+#     results.append(matching)
+# print("\nAll Candidates:\n")
+
+# print(json.dumps(results, indent=4))
 
 
 # ====================================================
@@ -497,3 +669,153 @@ print(invoice_data)
 # outputs/
 
 # This exercise should be treated as a mini-project.
+import os
+import json
+from pydantic import BaseModel , ValidationError
+from dotenv import load_dotenv
+from google import genai
+
+load_dotenv()
+
+api_key = os.getenv("GEMINI_API_KEY")
+
+client = genai.Client(api_key=api_key)
+
+document = """
+Invoice No: INV-9087
+Customer: ABC Technologies
+Date: 01-09-2026
+Product: Laptop
+Quantity: 3
+Unit Price: 65000
+Tax: 18%
+"""
+
+prompt = f"""
+You are a document classification system.
+
+Identify what type of document the following text represents.
+
+Supported document types are:
+
+- resume
+- invoice
+- complaint
+- meeting_notes
+- product_description
+
+Return only valid JSON with exactly these fields:
+
+{{
+    "document_type": "",
+    "confidence": 0
+}}
+
+Rules:
+
+1. document_type must be one of the supported document types.
+2. confidence must be a number between 0 and 100.
+3. Do not invent information.
+4. Return only JSON.
+
+Document:
+
+{document}
+"""
+
+response = client.models.generate_content(
+    model="gemini-3.5-flash",
+    contents=prompt,
+    config={
+        "response_mime_type": "application/json"
+    }
+)
+
+classification = json.loads(response.text)
+
+
+document_type = classification["document_type"]
+confidence = classification["confidence"]
+
+print("Document Type:", document_type)
+print("Confidence:", confidence)
+
+
+
+if document_type == "invoice":
+
+    print("Invoice document detected")
+
+    invoice_prompt = f"""
+    You are an invoice data extraction system.
+
+    Extract information from the following invoice.
+
+    Return only valid JSON with exactly these fields:
+
+    {{
+        "invoice_number": "",
+        "amount": 0
+    }}
+
+    Rules:
+
+    1. invoice_number must be the invoice number from the document.
+    2. amount must be the final invoice amount including tax.
+    3. amount must be a number.
+    4. Do not invent information.
+    5. Return only JSON.
+
+    Invoice:
+
+    {document}
+    """
+    invoice_response = client.models.generate_content(
+        model="gemini-3.6-flash",
+        contents=invoice_prompt,
+        config={
+            "response_mime_type": "application/json"
+        }
+    )
+
+
+
+    invoice_data = json.loads(invoice_response.text)
+
+    print("Invoice Data:")
+    print(invoice_data)
+
+
+elif document_type == "resume":
+
+    print("Resume document detected")
+
+
+elif document_type == "complaint":
+
+    print("Complaint document detected")
+
+
+elif document_type == "meeting_notes":
+
+    print("Meeting notes document detected")
+
+
+elif document_type == "product_description":
+
+    print("Product description document detected")
+
+
+else:
+
+    print("Unsupported document type")
+
+
+class Invoice_Schema(BaseModel):
+    invoice_number :str
+    amount :float
+try:
+    validated_invoice = Invoice_Schema(**invoice_data)
+
+except ValidationError as e:
+    print("Validation failed!" , e)
