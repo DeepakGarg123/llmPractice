@@ -137,7 +137,7 @@ print(result)
 # 3. Print the cleaned input and final response.
 
 
-import os
+"""import os
 from dotenv import load_dotenv
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_core.output_parsers import StrOutputParser
@@ -163,7 +163,7 @@ chain = cleaner|prompt|model|parser
 input = "Explain Python functions. "
 result = chain.invoke(input)
 print(result)
-
+"""
 # ====================================================
 # Exercise 4: Batch Processing
 # ====================================================
@@ -189,7 +189,38 @@ print(result)
 # 3. Store all outputs in a list.
 # 4. Print outputs with the corresponding topic names.
 
-
+"""import os
+from dotenv import load_dotenv
+from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.output_parsers import StrOutputParser
+load_dotenv()
+api_key = os.getenv('GEMINI_API_KEY')
+model = ChatGoogleGenerativeAI(
+    model = 'gemini-3.5-flash',
+    google_api_key = api_key
+)
+prompt = ChatPromptTemplate.from_messages(
+    ("system" , "You are an experienced techincal interviewer and teacher."
+    "Explain these topics in a very simple way."
+    "For each topic generate :"
+    "1. Definition"
+    "2. One example"
+    "3. One interview question"
+    "Topic : {topic}")
+)
+parser = StrOutputParser()
+chain = prompt|model|parser
+inputs = [
+    {"topic" : "REST API"},
+    {"topic" : "Docker"},
+    {"topic" : "Git Rebase"},
+    {"topic" : "SQL Index"},
+    {"topic" : "Async Programming"}
+]
+result = chain.batch(inputs)
+print(result)
+"""
 
 # ====================================================
 # Exercise 5: Streaming AI Tutor
@@ -221,6 +252,26 @@ print(result)
 
 # The user should see the response appear gradually.
 
+"""import os
+from dotenv import load_dotenv
+from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.output_parsers import StrOutputParser
+load_dotenv()
+api_key = os.getenv('GEMINI_API_KEY')
+model = ChatGoogleGenerativeAI(
+    model = 'gemini-3.5-flash',
+    google_api_key = api_key
+)
+prompt = ChatPromptTemplate.from_messages([
+    ("system" , "You are an experienced technical teacher."),
+    ("human" , "Explain {topic} for {difficulty} student.")
+])
+parser = StrOutputParser()
+chain = prompt|model|parser
+for chunk in chain.stream({"topic":"Neural networks" , "difficulty":"beginner"}):
+    print(chunk , end="")
+"""
 
 
 # ====================================================
@@ -264,6 +315,50 @@ print(result)
 #    - Summary
 #    - Interview questions
 
+"""import os
+from dotenv import load_dotenv
+from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.output_parsers import StrOutputParser
+from langchain_core.runnables import RunnableLambda
+load_dotenv()
+api_key = os.getenv('GEMINI_API_KEY')
+model = ChatGoogleGenerativeAI(
+    model = 'gemini-3.5-flash',
+    google_api_key = api_key
+)
+first_prompt = ChatPromptTemplate.from_messages([
+    ("system" ,"You are an experienced topic describer."),
+    ("human" , "explain this topic : {topic} in a very detailed way.") 
+])
+parser = StrOutputParser()
+second_prompt = ChatPromptTemplate.from_messages([
+    ("system" , "You are an experienced summary creator."),
+    ("human" , "Generate a short summary on the basis of this explanation : {explanation}")
+])
+third_prompt = ChatPromptTemplate.from_messages([
+    ("system" , "You are an experienced techincal interview questions generator."),
+    ("human" , "generate the technical interview questions based on this summary : {summary}")
+])
+first_chain = first_prompt|model|parser
+second_chain = second_prompt|model|parser
+third_chain = third_prompt|model|parser
+
+def prepare_explanation(explanation):
+    return{
+        "explanation" : explanation
+    }
+def prepare_summary(summary):
+    return{
+        "summary":summary
+    }
+chain = first_chain|RunnableLambda(prepare_explanation)|second_chain|RunnableLambda(prepare_summary)|third_chain
+
+result = chain.invoke({
+    "topic":"Vector Databases"
+})
+print(result)
+"""
 
 
 # ====================================================
@@ -307,7 +402,58 @@ print(result)
 
 # 4. Print each field separately.
 
+"""import os
+from dotenv import load_dotenv
+from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.output_parsers import StrOutputParser
+from langchain_core.runnables import RunnableParallel
+load_dotenv()
+api_key = os.getenv('GEMINI_API_KEY')
+model = ChatGoogleGenerativeAI(
+    model = 'gemini-3.5-flash',
+    google_api_key = api_key
+)
+first_task_prompt = ChatPromptTemplate.from_messages([
+    ("system" , "You are an experienced summary describer."),
+    ("human" , "generate the summary for the article :{article}")
+])
+parser = StrOutputParser()
+first_prompt_chain = first_task_prompt|model|parser
+second_task_prompt = ChatPromptTemplate.from_messages([
+    ("system" , "You are an experienced sentiment classifier."),
+    ("human" , "classify the sentiment of this article : {article}")
+])
+second_prompt_chain = second_task_prompt|model|parser
+third_task_prompt = ChatPromptTemplate.from_messages([
+    ("system" , "You are an experienced Keywords creator."),
+    ("human" , "create the keywords from this article : {article}")
+])
+third_prompt_chain = third_task_prompt|model|parser
+fourth_task_prompt = ChatPromptTemplate.from_messages([
+    ("system" , "You are an experienced title creator."),
+    ("human" , "Create the title for this article : {article}")
+])
+fourth_prompt_chain = fourth_task_prompt|model|parser
+chain = RunnableParallel(
+    summary = first_prompt_chain,
+    sentiment = second_prompt_chain,
+    keywords = third_prompt_chain,
+    title = fourth_prompt_chain
+)
+article = 
+Artificial Intelligence is changing businesses.
+It helps companies automate tasks and improve customer service.
+However, AI also creates privacy and ethical challenges.
 
+result = chain.invoke(
+    {"article"  : article}
+)
+print(result['summary'])
+print(result['sentiment'])
+print(result['keywords'])
+print(result['title'])
+"""
 
 # ====================================================
 # Exercise 8: Parallel + Sequential Combined Pipeline
@@ -351,6 +497,75 @@ print(result)
 # 3. Feed parallel results into the recommendation prompt.
 # 4. Do not manually copy each generated answer into another prompt.
 
+"""import os
+from dotenv import load_dotenv
+from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.output_parsers import StrOutputParser
+from langchain_core.runnables import RunnableParallel
+load_dotenv()
+api_key = os.getenv('GEMINI_API_KEY')
+model = ChatGoogleGenerativeAI(
+    model = 'gemini-3.5-flash',
+    google_api_key = api_key
+)
+first_task_prompt = ChatPromptTemplate.from_messages([
+    ("system" , "You are an experienced sentiment classifier."),
+    ("human" , "Classify this review : {review}")
+])
+parser = StrOutputParser()
+first_task_chain = first_task_prompt|model|parser
+second_task_prompt = ChatPromptTemplate.from_messages([
+    ("system" , "You are an experienced Problems Classifier."),
+    ("human" , "Classifyb the problem based on this review : {review}")
+])
+second_task_chain = second_task_prompt|model|parser
+third_task_prompt = ChatPromptTemplate.from_messages([
+    ("system" , "You are an experienced Positives Classifier."),
+    ("human" , "Illustrate the positives based on this review : {review}")
+])
+third_task_chain = third_task_prompt|model|parser
+combined = RunnableParallel(
+    sentiment = first_task_chain , 
+    problems = second_task_chain , 
+    positives = third_task_chain
+)
+recommendation_prompt = ChatPromptTemplate.from_messages([
+    (
+        "system",
+        "You are an experienced product recommendation expert."
+    ),
+    (
+        "human",
+        
+        Analyze the following product review analysis.
+
+        Sentiment:
+        {sentiment}
+
+        Problems:
+        {problems}
+
+        Positive Features:
+        {positives}
+
+        Give the final answer in this format:
+
+        Overall Opinion:
+        Main Advantages:
+        Main Problems:
+        Final Recommendation:
+        
+    )
+])
+recommendation_chain = recommendation_prompt|model|parser
+chain = combined|recommendation_chain
+review = "The headphones sound excellent but the battery only lasts three hours and they are expensive."
+result = chain.invoke({
+    "review":review
+})
+print(result)
+"""
 
 
 # ====================================================
@@ -393,8 +608,25 @@ print(result)
 #    the pipeline begins.
 # 3. Explain in comments why RunnablePassthrough was useful.
 
-
-
+"""import os
+from dotenv import load_dotenv
+from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.output_parsers import StrOutputParser
+from langchain_core.runnables import RunnableParallel , RunnablePassthrough
+load_dotenv()
+api_key = os.getenv('GEMINI_API_KEY')
+model = ChatGoogleGenerativeAI(
+    model = 'gemini-3.5-flash',
+    google_api_key = api_key
+)
+prompt = ChatPromptTemplate.from_messages(Guve the important concepts from this question.
+Question : {question}
+Give only the important concepts.)
+parser = StrOutputParser()
+prompt_chain = prompt|model|parser
+"""
+"""Doubt in Runnable Passthrough"""
 # ====================================================
 # Exercise 10: Advanced AI Research Report Pipeline
 # ====================================================
@@ -464,3 +696,73 @@ print(result)
 # 8. Handle exceptions properly.
 # 9. Keep the API key in .env.
 # 10. Organize project into multiple Python files.
+
+
+import os
+from dotenv import load_dotenv
+from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.output_parsers import StrOutputParser
+from langchain_core.runnables import RunnableParallel
+load_dotenv()
+api_key = os.getenv('GEMINI_API_KEY')
+model = ChatGoogleGenerativeAI(
+    model = 'gemini-3.5-flash-lite',
+    google_api_key = api_key
+)
+prompt = ChatPromptTemplate.from_template(
+    "Generate the overview of this topic: {topic} briefly."
+)
+parser = StrOutputParser()
+overview_chain = prompt|model|parser
+
+
+concept_prompt = ChatPromptTemplate.from_messages([
+    ("system" , "You are a conept generator."),
+    ("human" , "Give the concepts from this topic : {overview}")
+])
+
+concept_prompt_chain = concept_prompt|model|parser
+
+benefit_prompt = ChatPromptTemplate.from_messages([
+    ("system" , "You are a benefit generator."),
+    ("human" , "Generate the benefits on the basis of this overview : {overview}")
+])
+benefit_prompt_chain = benefit_prompt|model|parser
+
+Limitation_prompt = ChatPromptTemplate.from_messages([
+    ("system" , "You are an experienced Limitation describer."),
+    ("human" , "Generate the limitations on the basis of this overview : {overview}")
+])
+Limitation_prompt_chain = Limitation_prompt|model|parser
+
+Application_prompt = ChatPromptTemplate.from_messages([
+    ("system" , "You are an applications describer."),
+    ("human" , "Generate the applications for this overview : {overview}")
+])
+Application_prompt_chain = Application_prompt|model|parser
+
+Interview_prompt = ChatPromptTemplate.from_messages([
+    ("system" , "You are an experienced Interview questions generator"),
+    ("human" , "Give interview questions on the basis of this overview : {overview}")
+])
+Interview_prompt_chain = Interview_prompt|model|parser
+
+combined = RunnableParallel(
+    concept = concept_prompt_chain , 
+    benefit = benefit_prompt_chain ,
+    limitation = Limitation_prompt_chain , 
+    application = Application_prompt_chain , 
+    Interview_question = Interview_prompt_chain
+)
+
+final_chain = overview_chain|combined
+topic = "RAG"
+result = final_chain.invoke({
+    "topic":topic
+})
+print(result)
+
+
+"""Doubt in structured output"""
+
